@@ -9,7 +9,7 @@ import csv
 import sys
 
 root = Tk()
-root.title("Me//0W sorter V8 altha")
+root.title("Me//0W sorter v8.0.0 beta")
 path = "."
 
 
@@ -145,22 +145,24 @@ def changeText2():
 
 
 Button0 = tk.Button(root, text="Save", activeforeground="blue",
-                    height=5, width=50, command=lambda: [Save()])
-Button0.pack()
-
+                    height=5, width=20, command=lambda: [Save()])
 progress = Progressbar(root, orient=HORIZONTAL, length=450, mode='determinate')
 Button1 = tk.Button(root, text="Select input folder", activeforeground="blue",
                     height=5, width=50, command=lambda: [folder1(), changeText1()])
-Button1.pack()
 Button2 = tk.Button(root, text="Select output folder", activeforeground="blue",
                     height=5, width=50, command=lambda: [folder2(), changeText2()])
-Button2.pack()
 Button3 = tk.Button(root, text="Run Me//0W sorter",
                     activeforeground="green", height=5, width=50, command=Run)
-Button3.pack()
-Button4 = tk.Button(root, bg='black', text="UNDO",
-                    activeforeground="red", height=5, width=50, command=Undo)
-Button4.pack()
-progress.pack()
+Button4 = tk.Button(root, text="UNDO",
+                    activeforeground="red", height=5, width=20, command=Undo)
+
+
+Button0.grid(columnspan=1, column=1, row=6)  # save button
+Button1.grid(columnspan=3, column=1, row=2)  # inout
+Button2.grid(columnspan=3, column=1, row=3)  # output
+Button3.grid(columnspan=3, column=1, row=4)  # run
+Button4.grid(columnspan=1, column=2, row=6)  # undo
+progress.grid(columnspan=3, column=1, row=5)  # progras bar
+
 open_save()
 root.mainloop()
