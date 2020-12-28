@@ -5,7 +5,7 @@ import sys
 import threading
 import time
 import tkinter as tk
-from shutil import move
+from shutil import copy2
 from tkinter import *
 from tkinter import filedialog
 from tkinter.ttk import *
@@ -14,20 +14,28 @@ root = Tk()
 root.title("Me//0W sorter v9.0.0 beta")
 path = "."
 
+# selector for the inport folder
+
 
 def folder1():
     global folder_selected1
     folder_selected1 = filedialog.askdirectory()
+
+# selector for the output folder
 
 
 def folder2():
     global folder_selected2
     folder_selected2 = filedialog.askdirectory()
 
+# funcshon for saving paths
+
 
 def open_save():
     try:
+        # gets the curent systom path and conbins it with the save file name
         PathAndName = os.path.join(sys.path[0], 'mellow_sorter_save')
+        # makes and opans the save file
         with open(PathAndName, "r") as plants_csv:
             plants_readed = csv.reader(plants_csv, delimiter=',')
             for plants_row in plants_readed:
@@ -93,7 +101,7 @@ def Undo():
             os.chdir(subdir)
             for file in files:
                 try:
-                    shutil.move(file, folder_selected1)
+                    copy2(file, folder_selected1)
                 except:
                     print('nope')
         kill()

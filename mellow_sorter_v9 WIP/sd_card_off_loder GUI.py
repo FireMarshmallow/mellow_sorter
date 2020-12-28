@@ -2,17 +2,12 @@ import datetime
 import os
 import threading
 import tkinter as tk
-from shutil import move
+from shutil import copy2
 from time import sleep
 from tkinter import *
 
-top1 = Toplevel()
+top1 = Tk()
 top1.title("sd")
-
-
-def Stopreview():
-    camera.stop_preview()
-    print('preview stoped')
 
 
 def switchon():
@@ -37,7 +32,8 @@ def starttimelaps():
         while (switch == True):
             def path_to_drive():
                 list = [
-                    "/Volumes/WinInstall/tow",
+                    "/Volumes/EOS_DIGITAL/DCIM/100CANON/",
+                    '/Volumes/Untitled 1/DCIM/100MEDIA/',
                 ]  # SD card From canon
                 return list
 
@@ -62,12 +58,12 @@ def starttimelaps():
                     for fname in fileList:
                         # comdins to path with the file name
                         pathtofile = dirName + "/" + fname
-                        # trys to move the fils or skips it
-                        try:
+                        pathtopop = move_to + "/" + fname
+                        if os.path.exists(pathtopop) == False:
                             print("moving: " + fname)
-                            move(pathtofile, move_to)
-                        except:
-                            pass
+                            copy2(pathtofile, move_to)
+                        else:
+                            print(fname + " duplcet")
             print("scaning")
             if_connected()
             sleep(6)
@@ -80,7 +76,8 @@ onbutton = tk.Button(top1, height=3, width=15,
                      text="Start Scaning", command=switchon)
 offbutton = tk.Button(top1, height=3, width=15,
                       text="Stop scaning", command=switchoff)
-killbutton = tk.Button(top1, height=3, width=15, text="EXIT", command=kill)
+killbutton = tk.Button(top1, height=3, width=15, text="EXIT",
+                       command=lambda: [kill(), switchoff()])
 
 
 onbutton.grid(row=11, column=0)
