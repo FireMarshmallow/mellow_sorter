@@ -9,9 +9,10 @@ from shutil import copy2
 from tkinter import *
 from tkinter import filedialog
 from tkinter.ttk import *
+import pickle
 
 root = Tk()
-root.title("Me//0W sorter v9.0.0 beta")
+root.title("Me//0W sorter v9.1.0 beta")
 path = "."
 
 # selector for the inport folder
@@ -30,23 +31,39 @@ def folder2():
 
 # funcshon for saving paths
 
+#save############
+
+
+def save_file_path():
+    PathAndName = os.path.join(sys.path[0], "mellow_sorter_save.dat")
+    return PathAndName
+
+
+def Save(folder_selected1, folder_selected2):
+    thing_to_save_for_next_time = [
+        folder_selected1,
+        folder_selected2,
+    ]
+    outfile = open(save_file_path(), "wb")
+    pickle.dump(thing_to_save_for_next_time, outfile)
+    outfile.close()
+
 
 def open_save():
     try:
-        # gets the curent systom path and conbins it with the save file name
-        PathAndName = os.path.join(sys.path[0], 'mellow_sorter_save')
-        # makes and opans the save file
-        with open(PathAndName, "r") as plants_csv:
-            plants_readed = csv.reader(plants_csv, delimiter=',')
-            for plants_row in plants_readed:
-                global folder_selected1
-                global folder_selected2
-                folder_selected1 = plants_row[0]
-                changeText1()
-                folder_selected2 = plants_row[1]
-                changeText2()
+        infile = open(save_file_path(), "rb")
+        new_dict = pickle.load(infile)
+        infile.close()
+        global folder_selected2
+        global folder_selected1
+        folder_selected1 = new_dict[0]
+        folder_selected2 = new_dict[1]
+        changeText1()
+        changeText2()
     except:
         pass
+
+##############
 
 
 def Run():
@@ -111,39 +128,14 @@ def Undo():
 
     top = Toplevel()
     top.title("Undo")
-    warning = Label(top, text='!WARNING!')
-    warning.grid(row=0, column=1)
-    undoworning = Label(top, text='This will put all the files into')
-    undoworning.grid(row=1, column=1)
-    woringfolder = Label(top, text=folder_selected1)
-    woringfolder.grid(row=2, column=1)
-    nosub = Label(top, text='With NO sub folders')
-    nosub.grid(row=3, column=1)
-    undoconfarm = Button(top, text='continue', command=doit)
-    undoconfarm.grid(row=4, column=1)
-
-    button = Button(top, text="Dismiss", command=kill)
-    button.grid(row=5, column=1)
-
-
-def make_save_file():
-    PathAndName = os.path.join(sys.path[0], 'mellow_sorter_save')
-    if os.path.exists(PathAndName) == False:
-        with open(PathAndName, 'a') as bme280_csvfile:
-            bme280_heders = ['Path_to_Export', 'path_to_import']
-            writer = csv.DictWriter(bme280_csvfile, fieldnames=bme280_heders)
-            writer.writeheader()
-    return PathAndName
-
-
-def Save():
-    with open(make_save_file(), 'w') as save_csvfile:
-        save_data = [{'Path_to_Export': folder_selected1,
-                      'path_to_import': folder_selected2}]
-        fields = ['Path_to_Export', 'path_to_import']
-        write_save_data = csv.DictWriter(
-            save_csvfile, fieldnames=fields)
-        write_save_data.writerows(save_data)
+    warning = Label(top, text='!WARNING!').grid(row=0, column=1)
+    undoworning = Label(
+        top, text='This will put all the files into').grid(row=1, column=1)
+    woringfolder = Label(top, text=folder_selected1).grid(row=2, column=1)
+    nosub = Label(top, text='With NO sub folders').grid(row=3, column=1)
+    undoconfarm = Button(top, text='continue',
+                         command=doit).grid(row=4, column=1)
+    button = Button(top, text="Dismiss", command=kill).grid(row=5, column=1)
 
 
 def changeText1():
@@ -236,7 +228,7 @@ Button6 = tk.Button(root, text="sd", activeforeground="blue",
                     height=5, width=20, command=lambda: [sd()])
 
 Button0 = tk.Button(root, text="Save", activeforeground="blue",
-                    height=5, width=20, command=lambda: [Save()])
+                    height=5, width=20, command=lambda: [Save(folder_selected1, folder_selected2)])
 progress = Progressbar(root, orient=HORIZONTAL, length=450, mode='determinate')
 Button1 = tk.Button(root, text="Select input folder", activeforeground="blue",
                     height=5, width=50, command=lambda: [folder1(), changeText1()])
