@@ -94,7 +94,7 @@ def Run():
                      '/'+months_nom[int(modificationTime1)])
             if not os.path.exists(file):
                 try:
-                    shutil.move(this, dayFolder)
+                    shutil.copy2(this, dayFolder)
                     print(file, 'moved')
                 except:
                     print('cant move', file)
@@ -111,7 +111,7 @@ def Undo():
             os.chdir(subdir)
             for file in files:
                 try:
-                    shutil.move(file, folder_selected1)
+                    shutil.copy2(file, folder_selected1)
                 except:
                     print('nope')
         kill()
