@@ -188,9 +188,9 @@ start_stop_offlode.grid(row=2, column=0)
 
 # ##sorter###
 sorter_in_path = tk.Button(root, height=3, width=30,
-                           text='Sorter in path', command=sorter_in)
+                           text='(1)Sorter in path', command=sorter_in)
 sorter_out_path = tk.Button(root, height=3, width=30,
-                            text='Sorter out path', command=sorter_out)
+                            text='(2)Sorter out path', command=sorter_out)
 sorter_start_stop = tk.Button(root, height=3, width=30,
                               text='start Sorter', command=lambda: [On_switchs("sorter")])
 
@@ -209,7 +209,7 @@ def updatelist():
 
 # ##Backup###
 backup_out_path = tk.Button(root, height=3, width=30,
-                            text='backup out path', command=backup_out)
+                            text='(3)backup out path', command=backup_out)
 backup_start_stop = tk.Button(root, height=3, width=30,
                               text='start backup', command=lambda: [On_switchs("backup")])
 
