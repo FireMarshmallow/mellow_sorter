@@ -59,6 +59,9 @@ def open_save():
 ##############
 
 
+def iphone():
+
+
 def Run():
     path = folder_selected1
     for subdir, dirs, files in os.walk(path):
@@ -66,6 +69,8 @@ def Run():
         if '.DS_Store' in files:
             files.remove('.DS_Store')
         for file in files:
+            if file endswith(.HEIC):
+
             progress['maximum'] = len(files)
             try:
                 this = os.path.join(subdir, file)

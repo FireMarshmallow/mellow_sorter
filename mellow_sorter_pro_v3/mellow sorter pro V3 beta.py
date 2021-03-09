@@ -1,6 +1,5 @@
 import threading
-import tkinter as tk
-from tkinter import *
+import tkinter
 from time import sleep
 from tkinter import filedialog
 import os
@@ -10,7 +9,7 @@ import time
 import pickle
 from tkinter.ttk import Progressbar
 
-root = Tk()
+root = tkinter.Tk()
 root.title("Me//0W sorter pro")
 
 # ## Paths###
@@ -174,10 +173,10 @@ def change_backup_out(backup_out):
 
 # ##Changes to buttens.end###
 # ##offloder###
-listbox_widget = tk.Listbox(root, width=30, height=10,)
-Add_2_offlode = tk.Button(root, height=3, width=30,
-                          text='Add path', command=offlode_list)
-start_stop_offlode = tk.Button(
+listbox_widget = tkinter.Listbox(root, width=30, height=10,)
+Add_2_offlode = tkinter.Button(root, height=3, width=30,
+                               text='Add path', command=offlode_list)
+start_stop_offlode = tkinter.Button(
     root, height=3, width=30, text='Start offlode', command=lambda: [On_switchs("offlode")])
 
 Add_2_offlode.grid(row=1, column=0)
@@ -187,12 +186,12 @@ start_stop_offlode.grid(row=2, column=0)
 # ##offloder.end###
 
 # ##sorter###
-sorter_in_path = tk.Button(root, height=3, width=30,
-                           text='(1)Sorter in path', command=sorter_in)
-sorter_out_path = tk.Button(root, height=3, width=30,
-                            text='(2)Sorter out path', command=sorter_out)
-sorter_start_stop = tk.Button(root, height=3, width=30,
-                              text='start Sorter', command=lambda: [On_switchs("sorter")])
+sorter_in_path = tkinter.Button(root, height=3, width=30,
+                                text='(1)Sorter in path', command=sorter_in)
+sorter_out_path = tkinter.Button(root, height=3, width=30,
+                                 text='(2)Sorter out path', command=sorter_out)
+sorter_start_stop = tkinter.Button(root, height=3, width=30,
+                                   text='start Sorter', command=lambda: [On_switchs("sorter")])
 
 sorter_in_path.grid(row=5, column=0)
 sorter_out_path.grid(row=6, column=0)
@@ -200,35 +199,37 @@ sorter_start_stop.grid(row=7, column=0)
 
 
 def updatelist():
-    listbox_widget.delete(0, tk.END)
+    listbox_widget.delete(0, tkinter.END)
     for entry in list_of_paths_to_offlode:
-        listbox_widget.insert(tk.END, entry)
+        listbox_widget.insert(tkinter.END, entry)
 
 # ##sorter.end###
 
 
 # ##Backup###
-backup_out_path = tk.Button(root, height=3, width=30,
-                            text='(3)backup out path', command=backup_out)
-backup_start_stop = tk.Button(root, height=3, width=30,
-                              text='start backup', command=lambda: [On_switchs("backup")])
+backup_out_path = tkinter.Button(root, height=3, width=30,
+                                 text='(3)backup out path', command=backup_out)
+backup_start_stop = tkinter.Button(root, height=3, width=30,
+                                   text='start backup', command=lambda: [On_switchs("backup")])
 
 backup_out_path.grid(row=9, column=0)
 backup_start_stop.grid(row=10, column=0)
 # ##Backup.end###
 
-Save_pre_set = tk.Button(root, height=3, width=30,
-                         text='Save', command=Save).grid(row=12, column=0)
+Save_pre_set = tkinter.Button(root, height=3, width=30,
+                              text='Save', command=Save).grid(row=12, column=0)
 
 # ##cores###
 
 
 def Sorter_core(in_path, out_path):
+    print('started sorter')
+
     def run_sorter():
         for subdir, dirs, files in os.walk(in_path):
-            progress_bar_1['maximum'] = len(files)
+            progress_bar_sorter['maximum'] = len(files)
             for item in files:
-                if sorter_switch == False:
+                if sorter_switch is False:
                     break
                 Path_2_item = os.path.join(subdir, item)
                 try:
@@ -252,57 +253,58 @@ def Sorter_core(in_path, out_path):
                         print('cant copy', item)
                 else:
                     print(item, 'exists')
-                progress_bar_1.step()
+                progress_bar_sorter.step()
         off_switchs("sorter")
-    print(' Done')
+        print('sorting Finisht')
     Sorter_thread = threading.Thread(target=run_sorter)
     Sorter_thread.start()
 
 
 def Backup_core(src, dst, symlinks=False, ignore=None):
-    def run_backup():
-        if not os.path.exists(dst):
-            os.makedirs(dst)
-        for item in os.listdir(src):
-            if backup_switch == False:
-                break
-            s = os.path.join(src, item)
-            d = os.path.join(dst, item)
-            if os.path.isdir(s):
-                Backup_core(s, d, symlinks, ignore)
-            else:
-                if not os.path.exists(d) or os.stat(s).st_mtime - os.stat(d).st_mtime > 1:
-                    copy2(s, d)
-                    print('copying: ', s, 'to: ', d)
-    backup_thread = threading.Thread(target=run_backup)
-    backup_thread.start()
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            Backup_core(s, d, symlinks, ignore)
+        else:
+            if not os.path.exists(d) or os.stat(s).st_mtime - os.stat(d).st_mtime > 1:
+                copy2(s, d)
+                print('copying: ', s, 'to: ', d)
 
 
 def Offloder_core():
+    print('startind offloding')
+
     def run_Offloder():
         def if_connected():
             # gets path from list
             for path in list_of_paths_to_offlode:
                 # checks if the drive is conected
-                if os.path.exists(path) == True:
+                if os.path.exists(path) is True:
                     # tells the offlode def drive is conected
                     offlode_card(path)
                     # passes the path
-                    off_switchs("offlode")
+                    # off_switchs("offlode")
+            print("scaning")
+            sleep(5)
+            if Offloder_switch is True:
+                if_connected()
         # move files off sd card
 
         def offlode_card(sd):
             # walks the directory
             for dirName, subdirList, fileList in os.walk(sd, topdown=False):
                 filecount2 = len(dirName) + len(subdirList) + len(fileList)
-                progress_bar_3['maximum'] = filecount2
+                progress_bar_offloder['maximum'] = filecount2
                 for fname in fileList:
-                    if Offloder_switch == False:
+                    if Offloder_switch is False:
                         break
                     # comdins to path with the file name
                     pathtofile = dirName + "/" + fname
                     pathtopop = sorter_in + "/" + fname
-                    if os.path.exists(pathtopop) == False:
+                    if os.path.exists(pathtopop) is False:
                         try:
                             print("Copying: " + fname)
                             move(pathtofile, sorter_in)
@@ -310,29 +312,24 @@ def Offloder_core():
                             pass
                     else:
                         print(fname + " duplcet")
-                    progress_bar_3.step()
+                    progress_bar_offloder.step()
 
-        print("scaning")
-        if_connected()
-        sleep(6)
-
+        if Offloder_switch is True:
+            if_connected()
     Offloder_thread = threading.Thread(target=run_Offloder)
     Offloder_thread.start()
 
 
 # ##cores.end###
 # ## progres bar ###
-progress_bar_1 = Progressbar(root, orient=HORIZONTAL,
-                             length=270, mode='determinate')
-progress_bar_1.grid(row=8, column=0)
+progress_bar_sorter = Progressbar(root, length=270, mode='determinate')
+progress_bar_sorter.grid(row=8, column=0)
 
-progress_bar_2 = Progressbar(root, orient=HORIZONTAL,
-                             length=270, mode='determinate')
-progress_bar_2.grid(row=11, column=0)
+progress_bar_backup = Progressbar(root, length=270, mode='determinate')
+progress_bar_backup.grid(row=11, column=0)
 
-progress_bar_3 = Progressbar(root, orient=HORIZONTAL,
-                             length=270, mode='determinate')
-progress_bar_3.grid(row=4, column=0)
+progress_bar_offloder = Progressbar(root, length=270, mode='determinate')
+progress_bar_offloder.grid(row=4, column=0)
 # ## progres bar.end ###
 
 open_save()
