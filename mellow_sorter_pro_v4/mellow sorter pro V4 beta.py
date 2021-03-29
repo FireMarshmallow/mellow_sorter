@@ -120,6 +120,7 @@ def open_save():
     except FileNotFoundError:
         pass
 
+
 # ##save.end ###
 
 # ##Changes to buttens###
@@ -248,15 +249,17 @@ def Sorter_core(in_path, out_path):
 
     def run_sorter():
         for subdir, dirs, files in os.walk(in_path):
-            progress_bar_sorter["maximum"] = len(files)
+            progress_bar_sorter["maximum"] = len([os.path.join(
+                r, file) for r, d, f in os.walk(in_path) for file in f])
             for item in files:
                 if sorter_switch is False:
                     break
                 Path_2_item = os.path.join(subdir, item)
 
                 try:
-                    day = time.strftime("%d", time.localtime(
-                        os.path.getmtime(Path_2_item)))
+                    day = time.strftime(
+                        "%d", time.localtime(os.path.getmtime(Path_2_item))
+                    )
 
                     month = time.strftime(
                         "%B", time.localtime(os.path.getmtime(Path_2_item))
@@ -292,6 +295,9 @@ def Backup_core():
     def run_backup(src, dst, symlinks=False, ignore=None):
         if not os.path.exists(dst):
             os.makedirs(dst)
+        one = len([os.path.join(r, file)
+                   for r, d, f in os.walk(sorter_out) for file in f])
+        progress_bar_backup["maximum"] = one
         for item in os.listdir(src):
             if backup_switch is False:
                 break
@@ -300,13 +306,12 @@ def Backup_core():
             if os.path.isdir(s):
                 run_backup(s, d, symlinks, ignore)
             else:
-                if (
-                    not os.path.exists(d)
-                    or os.stat(s).st_mtime - os.stat(d).st_mtime > 1
-                ):
+                if (not os.path.exists(d) or os.stat(s).st_mtime - os.stat(d).st_mtime > 1):
                     copy2(s, d)
                     print("copying: ", s, "to: ", d)
-        off_switchs("backup")
+            progress_bar_backup.step()
+        # off_switchs("backup")
+
     Backup_thread = threading.Thread(
         target=run_backup, args=(sorter_out, backup_out))
     Backup_thread.start()
@@ -336,18 +341,16 @@ def Offloder_core():
             # walks the directory
             for dirName, subdirList, fileList in os.walk(sd, topdown=False):
                 # progres bar staff
-                # bug mathe dasent work
-                filecount2 = len(dirName) + len(subdirList) + len(fileList)
-                progress_bar_offloder["maximum"] = filecount2
+                progress_bar_offloder["maximum"] = len(
+                    [os.path.join(r, file) for r, d, f in os.walk(sd) for file in f])
 
                 for fname in fileList:
                     # off switch
                     if Offloder_switch is False:
                         break
-                    # comdins to path with the file name
-                    # update to path.join
-                    pathtofile = dirName + "/" + fname
-                    pathtopop = sorter_in + "/" + fname
+
+                    pathtofile = os.path.join(dirName, fname)
+                    pathtopop = os.path.join(sorter_in, fname)
 
                     # checks if file is alredy in folder
                     if os.path.exists(pathtopop) is False:
