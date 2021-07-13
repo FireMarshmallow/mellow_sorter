@@ -1,12 +1,12 @@
+import os
+import pickle
+import sys
 import threading
+import time
 import tkinter
+from shutil import copy2, move
 from time import sleep
 from tkinter import filedialog
-import os
-import sys
-from shutil import copy2, move
-import time
-import pickle
 from tkinter.ttk import Progressbar
 
 root = tkinter.Tk()
@@ -20,13 +20,6 @@ list_of_paths_to_offlode = []
 def offlode_list():
     list_of_paths_to_offlode.append(filedialog.askdirectory())
     updatelist()
-
-
-def backup_out():
-    global backup_out
-    backup_out = filedialog.askdirectory()
-    print(backup_out)
-    change_backup_out(backup_out)
 
 
 def sorter_in():
@@ -59,12 +52,6 @@ def On_switchs(power_on_core):
         change_offlode_on()
         Offloder_core()
 
-    if power_on_core == "backup":
-        global backup_switch
-        backup_switch = True
-        change_backup_on()
-        Backup_core()
-
 
 def off_switchs(power_on_core):
     if power_on_core == "sorter":
@@ -76,11 +63,6 @@ def off_switchs(power_on_core):
         global Offloder_switch
         Offloder_switch = False
         change_offlode_off()
-
-    if power_on_core == "backup":
-        global backup_switch
-        backup_switch = False
-        change_backup_off()
 
 
 # ##On-Off.end###
@@ -95,7 +77,6 @@ def Save():
         list_of_paths_to_offlode,
         sorter_in,
         sorter_out,
-        backup_out,
     ]
     with open(save_file_path(), "wb") as outfile:
         pickle.dump(thing_to_save_for_next_time, outfile)
@@ -109,13 +90,10 @@ def open_save():
             list_of_paths_to_offlode.append(item)
         global sorter_in
         global sorter_out
-        global backup_out
         sorter_in = new_dict[1]
         sorter_out = new_dict[2]
-        backup_out = new_dict[3]
         change_sorter_in(sorter_in)
         change_sorter_out(sorter_out)
-        change_backup_out(backup_out)
         updatelist()
     except FileNotFoundError:
         pass
@@ -136,11 +114,6 @@ def change_offlode_off():
     start_stop_offlode["command"] = lambda: [On_switchs("offlode")]
 
 
-def change_backup_off():
-    backup_start_stop["text"] = "start backup"
-    backup_start_stop["command"] = lambda: [On_switchs("backup")]
-
-
 def change_Sorter_on():
     sorter_start_stop["text"] = "Stop sorter"
     sorter_start_stop["command"] = lambda: [off_switchs("sorter")]
@@ -151,21 +124,12 @@ def change_offlode_on():
     start_stop_offlode["command"] = lambda: [off_switchs("offlode")]
 
 
-def change_backup_on():
-    backup_start_stop["text"] = "Stop backup"
-    backup_start_stop["command"] = lambda: [off_switchs("backup")]
-
-
 def change_sorter_in(sorter_in):
     sorter_in_path["text"] = sorter_in
 
 
 def change_sorter_out(sorter_out):
     sorter_out_path["text"] = sorter_out
-
-
-def change_backup_out(backup_out):
-    backup_out_path["text"] = backup_out
 
 
 # ##Changes to buttens.end###
@@ -221,22 +185,6 @@ def updatelist():
 # ##sorter.end###
 
 
-# ##Backup###
-backup_out_path = tkinter.Button(
-    root, height=3, width=30, text="(3)backup out path", command=backup_out
-)
-backup_start_stop = tkinter.Button(
-    root,
-    height=3,
-    width=30,
-    text="start backup",
-    command=lambda: [On_switchs("backup")],
-)
-
-backup_out_path.grid(row=9, column=0)
-backup_start_stop.grid(row=10, column=0)
-# ##Backup.end###
-
 Save_pre_set = tkinter.Button(
     root, height=3, width=30, text="Save", command=Save)
 Save_pre_set.grid(row=12, column=0)
@@ -279,8 +227,11 @@ def Sorter_core(in_path, out_path):
 
                 pathtochack2 = os.path.join(pathtochack, item)
                 if not os.path.exists(pathtochack2):
-                    move(Path_2_item, pathtochack)
-                    print(item, "copyed")
+                    try:
+                        move(Path_2_item, pathtochack)
+                        print(item, "copyed")
+                    except:
+                        pass
                 else:
                     print(item, "exists")
                 progress_bar_sorter.step()
@@ -289,32 +240,6 @@ def Sorter_core(in_path, out_path):
 
     Sorter_thread = threading.Thread(target=run_sorter)
     Sorter_thread.start()
-
-
-def Backup_core():
-    def run_backup(src, dst, symlinks=False, ignore=None):
-        if not os.path.exists(dst):
-            os.makedirs(dst)
-        one = len([os.path.join(r, file)
-                   for r, d, f in os.walk(sorter_out) for file in f])
-        progress_bar_backup["maximum"] = one
-        for item in os.listdir(src):
-            if backup_switch is False:
-                break
-            s = os.path.join(src, item)
-            d = os.path.join(dst, item)
-            if os.path.isdir(s):
-                run_backup(s, d, symlinks, ignore)
-            else:
-                if (not os.path.exists(d) or os.stat(s).st_mtime - os.stat(d).st_mtime > 1):
-                    copy2(s, d)
-                    print("copying: ", s, "to: ", d)
-            progress_bar_backup.step()
-        # off_switchs("backup")
-
-    Backup_thread = threading.Thread(
-        target=run_backup, args=(sorter_out, backup_out))
-    Backup_thread.start()
 
 
 def Offloder_core():
@@ -372,8 +297,6 @@ def Offloder_core():
 progress_bar_sorter = Progressbar(root, length=270, mode="determinate")
 progress_bar_sorter.grid(row=8, column=0)
 
-progress_bar_backup = Progressbar(root, length=270, mode="determinate")
-progress_bar_backup.grid(row=11, column=0)
 
 progress_bar_offloder = Progressbar(root, length=270, mode="determinate")
 progress_bar_offloder.grid(row=4, column=0)

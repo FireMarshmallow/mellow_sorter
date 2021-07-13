@@ -59,8 +59,6 @@ def open_save():
 ##############
 
 
-def iphone():
-
 
 def Run():
     path = folder_selected1
