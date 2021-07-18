@@ -25,6 +25,7 @@ for subdir, dirs, files in os.walk(heic):
 
 
 
+
 #check if file exists 
 
 #move both files to live photos
