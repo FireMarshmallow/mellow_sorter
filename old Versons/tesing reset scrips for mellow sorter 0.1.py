@@ -2,12 +2,12 @@ import os
 import shutil
 import random
 
-dir_org = "/Users/tomaszburzy/Desktop/organised folder"
-import_dir = '/Volumes/WinInstall/here'
-temp_dir = '/Volumes/WinInstall'
-bin1 = '/Volumes/WinInstall/bin'
+dir_org = "/Users/username/Desktop/organised folder"
+import_dir = "/Volumes/WinInstall/here"
+temp_dir = "/Volumes/WinInstall"
+bin1 = "/Volumes/WinInstall/bin"
 
-'''
+"""
 i = 0
 while i < 50:
      exclude_prefixes = ('.DS_Store')  # exclusion prefixes
@@ -31,42 +31,41 @@ while i < 50:
      i += 1
 
 
-filePath = '/Users/tomaszburzy/Desktop/temp folder/18 - 05 - 2020'
-bin1 = '/Users/tomaszburzy/Desktop/poop'
+filePath = '/Users/username/Desktop/temp folder/18 - 05 - 2020'
+bin1 = '/Users/username/Desktop/poop'
 # As file at filePath is deleted now, so we should check if file exists or not not before deleting them
 if os.path.exists(filePath):
     shutil.move(filePath,bin1)
 else:
     print("Can not delete the file as it doesn't exists")
 
-'''
-os.chdir('/Volumes/WinInstall')
+"""
+os.chdir("/Volumes/WinInstall")
 for root, dirs, files in os.walk(temp_dir, topdown=False):
-   for name in dirs:
-     hello = (os.path.join(root, name))
-     
+    for name in dirs:
+        hello = os.path.join(root, name)
+
 random_dir = random.choice(dirs)
 
 
 loop1 = 0
 while loop1 < 1000:
-     for root, dirs, files in os.walk(random_dir):
-          files = [f for f in files if not f[0] == '.']
-     
-     #if not files.remove('.DS_Store'):
-     #     print(sweet)
+    for root, dirs, files in os.walk(random_dir):
+        files = [f for f in files if not f[0] == "."]
 
-     if len(random_dir)==0:
-          print('its empty')
-          shutil.move(random_dir,bin1)
-     try:
-          filepick = root+'/'+random.choice(files)
-     except IndexError as error:
-          break
+    # if not files.remove('.DS_Store'):
+    #     print(sweet)
 
-     
-     shutil.move(filepick,import_dir)
+    if len(random_dir) == 0:
+        print("its empty")
+        shutil.move(random_dir, bin1)
+    try:
+        filepick = root + "/" + random.choice(files)
+    except IndexError as error:
+        break
 
-     print(root)
-     print(filepick)
-     loop1 +=1
+    shutil.move(filepick, import_dir)
+
+    print(root)
+    print(filepick)
+    loop1 += 1

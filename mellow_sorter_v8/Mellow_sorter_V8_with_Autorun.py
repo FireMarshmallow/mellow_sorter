@@ -11,14 +11,11 @@ import sys
 import time
 import tkinter
 from shutil import move
-import tkinter
 from tkinter import filedialog
+from tkinter import *
 
 root = tkinter.Tk()
-root.title("Me//0W sorter pro V4")
-
-global list_of_paths_to_offlode
-list_of_paths_to_offlode = []
+root.title("Me//0W sorter pro V4 with autorun")
 
 
 def sorter_in():
@@ -54,7 +51,6 @@ def save_file_path():
 
 def Save():
     thing_to_save_for_next_time = [
-        list_of_paths_to_offlode,
         sorter_in,
         sorter_out,
     ]
@@ -66,15 +62,12 @@ def open_save():
     try:
         with open(save_file_path(), "rb") as infile:
             new_dict = pickle.load(infile)
-        for item in new_dict[0]:
-            list_of_paths_to_offlode.append(item)
         global sorter_in
         global sorter_out
-        sorter_in = new_dict[1]
-        sorter_out = new_dict[2]
+        sorter_in = new_dict[0]
+        sorter_out = new_dict[1]
         change_sorter_in(sorter_in)
         change_sorter_out(sorter_out)
-        # updatelist()
     except FileNotFoundError:
         pass
 
@@ -111,12 +104,17 @@ sorter_start_stop = tkinter.Button(
     command=lambda: [On_switchs("sorter")],
 )
 
+box = IntVar()
+c = Checkbutton(root, text="AutoRun Ever hour", variable=box)
+
 sorter_in_path.grid(row=5, column=0)
 sorter_out_path.grid(row=6, column=0)
 sorter_start_stop.grid(row=7, column=0)
 
 Save_pre_set = tkinter.Button(root, height=3, width=30, text="Save", command=Save)
 Save_pre_set.grid(row=12, column=0)
+
+c.grid(row=13, column=0)
 
 
 def Sorter_core(in_path, out_path):
@@ -154,8 +152,13 @@ def Sorter_core(in_path, out_path):
                     print(item, "copyed")
                 except:
                     print(item, "exists")
+
     off_switchs("sorter")
     print("sorting Finisht")
+    if box.get() == 1:
+        time.sleep(3600)
+        print("loop")
+        On_switchs("sorter")
 
 
 open_save()

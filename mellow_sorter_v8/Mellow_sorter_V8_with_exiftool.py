@@ -15,7 +15,7 @@ import tkinter
 from tkinter import filedialog
 
 root = tkinter.Tk()
-root.title("Me//0W sorter pro V4")
+root.title("Me//0W sorter With exiftool")
 
 global list_of_paths_to_offlode
 list_of_paths_to_offlode = []
@@ -114,35 +114,46 @@ sorter_start_stop = tkinter.Button(
 sorter_in_path.grid(row=5, column=0)
 sorter_out_path.grid(row=6, column=0)
 sorter_start_stop.grid(row=7, column=0)
-
 Save_pre_set = tkinter.Button(root, height=3, width=30, text="Save", command=Save)
 Save_pre_set.grid(row=12, column=0)
 
 
 def Sorter_core(in_path, out_path):
     for subdir, dirs, files in os.walk(in_path):
+        if ".DS_Store" in files:
+            files.remove(".DS_Store")
         for item in files:
             Path_2_item = os.path.join(subdir, item)
             try:
-                day = time.strftime("%d", time.localtime(os.path.getmtime(Path_2_item)))
+                with exiftool.ExifTool() as e:
+                    metadata = e.get_metadata(Path_2_item)
+                    exifdate = metadata["QuickTime:MediaCreateDate"]
+                    months_nom = [
+                        "thisisnothint",
+                        "01 - January",
+                        "02 - February",
+                        "03 - March",
+                        "04 - April",
+                        "05 - may",
+                        "06 - June",
+                        "07 - July",
+                        "08 - August",
+                        "09 - September",
+                        "10 - October",
+                        "11 - November",
+                        "12 - December",
+                    ]
 
-                monthname = time.strftime(
-                    "%B", time.localtime(os.path.getmtime(Path_2_item))
-                )
+                    year = exifdate[:4]
+                    day = exifdate[8:10]
+                    month = exifdate[5:7]
+                    month_text = months_nom[int(month)]
 
-                monthnom = time.strftime(
-                    "%m", time.localtime(os.path.getmtime(Path_2_item))
-                )
-                month = monthnom + " - " + monthname
-
-                year = time.strftime(
-                    "%Y", time.localtime(os.path.getmtime(Path_2_item))
-                )
             except FileNotFoundError:
                 pass
 
-            day_name = day + " - " + monthnom + " - " + year
-            pathtochack = os.path.join(out_path, year, month, day_name)
+            day_name = day + " - " + month + " - " + year
+            pathtochack = os.path.join(out_path, year, month_text, day_name)
 
             if not os.path.exists(pathtochack):
                 os.makedirs(pathtochack)
@@ -154,7 +165,7 @@ def Sorter_core(in_path, out_path):
                     print(item, "copyed")
                 except:
                     print(item, "exists")
-    off_switchs("sorter")
+    # off_switchs("sorter")
     print("sorting Finisht")
 
 
